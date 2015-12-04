@@ -5,6 +5,8 @@ import java.util.Random;
 import ec.util.MersenneTwisterFast;
 
 public class GraphRandom extends Random {
+
+	private static final long serialVersionUID = 1L;
 	private MersenneTwisterFast m;
 
 	public GraphRandom(MersenneTwisterFast m) {
