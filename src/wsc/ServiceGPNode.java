@@ -21,6 +21,9 @@ public class ServiceGPNode extends GPNode {
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
 		WSCData rd = ((WSCData) (input));
 		rd.qos = Arrays.copyOf(service.qos, service.qos.length);
+		rd.maxLayer = service.layer;
+		rd.inputs = service.inputs;
+		rd.outputs = service.outputs;
 	}
 
 	public void setService(Service s) {

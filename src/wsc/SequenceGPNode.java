@@ -1,6 +1,7 @@
 package wsc;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import ec.EvolutionState;
 import ec.Problem;
@@ -21,12 +22,15 @@ public class SequenceGPNode extends GPNode {
 
 		children[0].eval(state, thread, input, stack, individual, problem);
 		qos = Arrays.copyOf(rd.qos, rd.qos.length);
+		Set<String> inputs = rd.inputs;
 
 		children[1].eval(state, thread, input, stack, individual, problem);
 		rd.qos[WSCInitializer.TIME] += qos[WSCInitializer.TIME];
 		rd.qos[WSCInitializer.COST] += qos[WSCInitializer.COST];
 		rd.qos[WSCInitializer.AVAILABILITY] *= qos[WSCInitializer.AVAILABILITY];
 		rd.qos[WSCInitializer.RELIABILITY] *= qos[WSCInitializer.RELIABILITY];
+		// The inputs should be those of the left child, but the outputs and max layer are just those of the right child (already retrieved)
+		rd.inputs = inputs;
 	}
 
 	@Override

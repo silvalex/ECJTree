@@ -48,6 +48,7 @@ public class WSCInitializer extends GPInitializer {
 	public Service startServ;
 	public Service endServ;
 	public GraphRandom random;
+	public List<List<Service>> layers;
 
 	public final double minAvailability = 0.0;
 	public double maxAvailability = -1.0;
@@ -119,6 +120,25 @@ public class WSCInitializer extends GPInitializer {
 			}
 		}
 		return satisfied;
+	}
+
+	/**
+	 * Checks whether set of inputs can be completely satisfied by the search
+	 * set, making sure to check descendants of input concepts for the subsumption.
+	 *
+	 * @param inputs
+	 * @param searchSet
+	 * @return true if search set subsumed by input set, false otherwise.
+	 */
+	public Set<String> getInputsNotSubsumed(Set<String> inputs, Set<String> searchSet) {
+		Set<String> notSatisfied = new HashSet<String>();
+		for (String input : inputs) {
+			Set<String> subsumed = taxonomyMap.get(input).getSubsumedConcepts();
+			if (!isIntersection( searchSet, subsumed )) {
+				notSatisfied.add(input);
+			}
+		}
+		return notSatisfied;
 	}
 
     private static boolean isIntersection( Set<String> a, Set<String> b ) {
@@ -268,9 +288,16 @@ public class WSCInitializer extends GPInitializer {
 
 		Set<String> cSearch = new HashSet<String>(inputs);
 		Set<Service> sSet = new HashSet<Service>();
+		int layer = 0;
 		Set<Service> sFound = discoverService(services, cSearch);
 		while (!sFound.isEmpty()) {
 			sSet.addAll(sFound);
+			layers.add(layer, new ArrayList<Service>(sFound));
+			// Record the layer that the services belong to in each node
+			for (Service s : layers.get(layer))
+				s.layer = layer;
+
+			layer++;
 			services.removeAll(sFound);
 			for (Service s: sFound) {
 				cSearch.addAll(s.getOutputs());

@@ -10,6 +10,7 @@ public class Service {
 	public double[] qos;
 	public Set<String> inputs;
 	public Set<String> outputs;
+	public int layer;
 
 	public Service(String name, double[] qos, Set<String> inputs, Set<String> outputs) {
 		this.name = name;

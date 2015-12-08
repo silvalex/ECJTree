@@ -1,6 +1,8 @@
 package wsc;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import ec.EvolutionState;
 import ec.Problem;
@@ -15,18 +17,41 @@ public class ParallelGPNode extends GPNode {
 
 	@Override
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
-		double[] qos;
+		double[] overallQos = new double[4];
+		overallQos[WSCInitializer.TIME] = 0;
+		overallQos[WSCInitializer.COST] = 0;
+		overallQos[WSCInitializer.AVAILABILITY] = 1;
+		overallQos[WSCInitializer.RELIABILITY] = 1;
+		Set<String> overallInputs = new HashSet<String>();
+		Set<String> overallOutputs = new HashSet<String>();
+		int overallMaxLayer = 0;
 
 		WSCData rd = ((WSCData) (input));
 
-		children[0].eval(state, thread, input, stack, individual, problem);
-		qos = Arrays.copyOf(rd.qos, rd.qos.length);
+		for (GPNode child : children) {
+			child.eval(state, thread, input, stack, individual, problem);
 
-		children[1].eval(state, thread, input, stack, individual, problem);
-		rd.qos[WSCInitializer.TIME] = Math.max(rd.qos[WSCInitializer.TIME], qos[WSCInitializer.TIME]);
-		rd.qos[WSCInitializer.COST] += qos[WSCInitializer.COST];
-		rd.qos[WSCInitializer.AVAILABILITY] *= qos[WSCInitializer.AVAILABILITY];
-		rd.qos[WSCInitializer.RELIABILITY] *= qos[WSCInitializer.RELIABILITY];
+			// Update overall QoS
+			overallQos[WSCInitializer.COST] += rd.qos[WSCInitializer.COST];
+			overallQos[WSCInitializer.AVAILABILITY] *= rd.qos[WSCInitializer.AVAILABILITY];
+			overallQos[WSCInitializer.RELIABILITY] *= rd.qos[WSCInitializer.RELIABILITY];
+			if (rd.qos[WSCInitializer.TIME] > overallQos[WSCInitializer.TIME])
+				overallQos[WSCInitializer.TIME] = rd.qos[WSCInitializer.TIME];
+
+			// Update overall inputs and outputs
+			overallInputs.addAll(rd.inputs);
+			overallOutputs.addAll(rd.outputs);
+
+			// Update overall max. layer
+			if (rd.maxLayer > overallMaxLayer)
+				overallMaxLayer = rd.maxLayer;
+		}
+
+		// Finally, set the data with the overall values before exiting the evaluation
+		rd.qos = overallQos;
+		rd.inputs = overallInputs;
+		rd.outputs = overallOutputs;
+		rd.maxLayer = overallMaxLayer;
 	}
 
 	@Override

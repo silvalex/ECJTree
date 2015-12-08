@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import ec.EvolutionState;
@@ -197,4 +198,122 @@ public class WSCSpecies extends Species {
 			}
 		}
 	}
+
+	public GPNode createNewTree(EvolutionState state, Set<String> inputSet, Set<String> outputSet) {
+		WSCInitializer init = (WSCInitializer) state.initializer;
+
+		// Find nodes that satisfy the given output
+		Set<Service> services = new HashSet<Service>();
+
+		outputLoop:
+		for (String o : outputSet) {
+			List<Service> candidates = init.taxonomyMap.get(o).servicesWithOutput;
+			Collections.shuffle(candidates);
+			for (Service cand : candidates) {
+				if (init.relevant.contains(cand)) {
+					services.add(cand);
+					break outputLoop;
+				}
+			}
+		}
+
+		GPNode root = recCreateNewTree(init, services, inputSet, outputSet);
+		return root;
+	}
+
+	public GPNode recCreateNewTree(WSCInitializer init, Set<Service> services, Set<String> inputSet, Set<String> outputSet) {
+
+		GPNode root;
+		List<Service> satisfiedByStart = new ArrayList<Service>();
+
+		// Check which nodes can be fully satisfied by the inputs provided
+		checkSatisfiedByInputs(init, services, inputSet, satisfiedByStart);
+
+		// Add these inputs to the list of subtrees
+		List<GPNode> subtrees = new ArrayList<GPNode>();
+		for (Service satisfied : satisfiedByStart) {
+			ServiceGPNode servNode = new ServiceGPNode();
+			servNode.setService(satisfied);
+			subtrees.add(servNode);
+		}
+
+		// If not all nodes can be satisfied by the inputs provided
+		Map<Service, Set<Service>> predecessorMap = new HashMap<Service, Set<Service>>();
+
+		// Find predecessors in previous layers for each node, checking if start satisfies them.
+		for (Service s : services) {
+			if (!satisfiedByStart.contains(s)) {
+				Set<Service> predecessors = findPredecessors(init, inputSet, s);
+				predecessorMap.put(s, predecessors);
+			}
+		}
+
+		// For each individual node, create a subtree with a sequence node root, and the node as the right child.
+		for (Entry<Service, Set<Service>> entry : predecessorMap.entrySet()) {
+			SequenceGPNode seq = new SequenceGPNode();
+			subtrees.add(seq);
+			GPNode[] children = new GPNode[2];
+
+			// The left-hand side contains the tree for the predecessor
+			GPNode leftChild = recCreateNewTree(init, entry.getValue(), inputSet, outputSet);
+			leftChild.parent = seq;
+			children[0] = leftChild;
+
+			// The right-hand side contains the node satisfied
+			ServiceGPNode rightChild = new ServiceGPNode();
+			rightChild.setService(entry.getKey());
+			rightChild.parent = seq;
+			children[1] = rightChild;
+		}
+
+		// If more than one subtree is created, put all of them under a parallel node parent.
+		if (subtrees.size() > 1) {
+			ParallelGPNode parNode = new ParallelGPNode();
+			parNode.children = new GPNode[subtrees.size()];
+			for (int i = 0; i < parNode.children.length; i++) {
+				parNode.children[i] = subtrees.get(i);
+				parNode.children[i].parent = parNode;
+			}
+			root = parNode;
+		}
+		else if (subtrees.size() == 1){
+			root = subtrees.get(0);
+		}
+		else {
+			throw new RuntimeException("A service that is not fully satisfied by the");
+		}
+
+		return root;
+	}
+
+	public int checkSatisfiedByInputs(WSCInitializer init, Set<Service> services, Set<String> inputs, List<Service> satisfiedByStart) {
+		for (Service s : services) {
+			if (init.isSubsumed(s.getInputs(), inputs))
+				satisfiedByStart.add(s);
+		}
+		return satisfiedByStart.size();
+	}
+
+	public Set<Service> findPredecessors(WSCInitializer init, Set<String> inputs, Service s) {
+		Set<Service> predecessors = new HashSet<Service>();
+
+		// Get only inputs that are not subsumed by the given composition inputs
+		Set<String> inputsNotSatisfied = init.getInputsNotSubsumed(s.getInputs(), inputs);
+
+		// Find services to satisfy all inputs
+		inputLoop:
+		for (String i : inputsNotSatisfied) {
+			List<Service> candidates = init.taxonomyMap.get(i).servicesWithOutput;
+			Collections.shuffle(candidates, init.random);
+
+			for(Service cand : candidates) {
+				if (init.relevant.contains(cand) && cand.layer < s.layer) {
+					predecessors.add(s);
+					break inputLoop;
+				}
+			}
+		}
+		return predecessors;
+	}
+
 }
