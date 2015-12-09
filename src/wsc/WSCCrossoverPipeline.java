@@ -71,8 +71,18 @@ public class WSCCrossoverPipeline extends BreedingPipeline {
             Collections.shuffle( allT2Nodes, init.random );
             
             // For each t1 node, see if it can be replaced by a t2 node
+            GPNode[] nodes = findReplacement(init, allT1Nodes, allT2Nodes);
+            GPNode nodeT1 = nodes[0];
+            GPNode replacementT2 = nodes[1];
             
             // For each t2 node, see if it can be replaced by a t1 node
+            nodes = findReplacement(init, allT2Nodes, allT1Nodes);
+            GPNode nodeT2 = nodes[0];
+            GPNode replacementT1 = nodes[1];
+            
+            // Perform replacement in both individuals
+            t1.replaceNode( nodeT1, replacementT2 );
+            t2.replaceNode( nodeT2, replacementT1 );
 
 	        inds[q] = t1;
 	        inds[q].evaluated=false;
@@ -84,5 +94,24 @@ public class WSCCrossoverPipeline extends BreedingPipeline {
         }
         return n1;
 	}
-
+	
+	public GPNode[] findReplacement(WSCInitializer init, List<GPNode> nodes, List<GPNode> replacements) {
+	    GPNode[] result = new GPNode[2];
+	    for (GPNode node : nodes) {
+	        for (GPNode replacement : replacements) {
+	            /* Check if the inputs of replacement are subsumed by the inputs of the
+	             * node and the outputs of the node are subsumed by the outputs of the
+	             * replacement. This will ensure that the replacement has equivalent
+	             * functionality to the replacement.*/
+	            InOutNode ioNode = (InOutNode) node;
+	            InOutNode ioReplacement = (InOutNode) replacement;
+	            if (init.isSubsumed( ioReplacement.getInputs(), ioNode.getInputs() ) && init.isSubsumed( ioNode.getOutputs(), ioReplacement.getOutputs() )) {
+	                result[0] = node;
+	                result[1] = replacement;
+	                break;
+	            }
+	        }
+	    }
+	    return result;
+	}
 }

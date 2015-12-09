@@ -79,4 +79,20 @@ public class WSCIndividual extends GPIndividual {
 
         return allNodes;
     }
+    
+    public void replaceNode(GPNode node, GPNode replacement) {
+        GPNode parentNode = (GPNode) node.parent;
+        if (parentNode == null) {
+            super.trees[0].child = replacement;
+        }
+        else {
+            replacement.parent = node.parent;
+            for (int i = 0; i < parentNode.children.length; i++) {
+                if (parentNode.children[i] == node) {
+                    parentNode.children[i] = replacement;
+                    break;
+                }
+            }
+        }
+    }
 }

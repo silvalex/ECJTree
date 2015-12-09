@@ -70,19 +70,7 @@ public class WSCMutationPipeline extends BreedingPipeline {
             GPNode newNode = species.createNewTree( state, ioNode.getInputs(), ioNode.getOutputs() );
             
             // Replace the old tree with the new one
-            GPNode parentNode = (GPNode) selectedNode.parent;
-            if (parentNode == null) {
-                tree.trees[0].child = newNode;
-            }
-            else {
-                newNode.parent = selectedNode.parent;
-                for (int i = 0; i < parentNode.children.length; i++) {
-                    if (parentNode.children[i] == selectedNode) {
-                        parentNode.children[i] = newNode;
-                        break;
-                    }
-                }
-            }
+            tree.replaceNode( selectedNode, newNode );
             
             tree.evaluated=false;
         }

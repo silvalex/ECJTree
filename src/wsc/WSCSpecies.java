@@ -14,8 +14,8 @@ import ec.Individual;
 import ec.Species;
 import ec.gp.GPNode;
 import ec.util.Parameter;
-import graph.GraphEdge;
 import graph.Graph;
+import graph.GraphEdge;
 import graph.GraphNode;
 
 public class WSCSpecies extends Species {
@@ -30,9 +30,13 @@ public class WSCSpecies extends Species {
 	@Override
 	public Individual newIndividual(EvolutionState state, int thread) {
 	    WSCInitializer init = (WSCInitializer) state.initializer;
-	    Graph graph = createNewGraph(state, init.startServ, init.endServ, init.relevant);
+	    
+	    //Graph graph = createNewGraph(state, init.startServ, init.endServ, init.relevant);
 	    // Turn graph to tree, and return that tree
-	    GPNode treeRoot = graph.nodeMap.get("start").toTree();
+	    //GPNode treeRoot = graph.nodeMap.get("start").toTree();
+	    
+	    GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput);
+	    
 	    return new WSCIndividual(treeRoot);
 	}
 
