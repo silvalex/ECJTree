@@ -70,6 +70,8 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 	public ServiceGPNode clone() {
 		ServiceGPNode newNode = new ServiceGPNode();
 		newNode.setService(service);
+	    newNode.inputs = inputs;
+	    newNode.outputs = outputs;
 		return newNode;
 	}
 

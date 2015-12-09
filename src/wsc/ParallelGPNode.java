@@ -63,15 +63,17 @@ public class ParallelGPNode extends GPNode implements InOutNode {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Parallel(");
-		for (int i = 0; i < children.length; i++) {
-			GPNode child = children[i];
-			if (child != null)
-				builder.append(children[i].toString());
-			else
-				builder.append("null");
-			if (i != children.length - 1){
-				builder.append(",");
-			}
+		if (children != null) {
+    		for (int i = 0; i < children.length; i++) {
+    			GPNode child = children[i];
+    			if (child != null)
+    				builder.append(children[i].toString());
+    			else
+    				builder.append("null");
+    			if (i != children.length - 1){
+    				builder.append(",");
+    			}
+    		}
 		}
 		builder.append(")");
 		return builder.toString();
@@ -84,12 +86,15 @@ public class ParallelGPNode extends GPNode implements InOutNode {
 
 	@Override
 	public ParallelGPNode clone() {
+	    ParallelGPNode newNode = new ParallelGPNode();
 		GPNode[] newChildren = new GPNode[children.length];
 		for (int i = 0; i < children.length; i++) {
 			newChildren[i] = (GPNode) children[i].clone();
+			newChildren[i].parent = newNode;
 		}
-		ParallelGPNode newNode = new ParallelGPNode();
 		newNode.children = newChildren;
+	    newNode.inputs = inputs;
+	    newNode.outputs = outputs;
 		return newNode ;
 	}
 

@@ -1,9 +1,11 @@
 package wsc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import ec.BreedingPipeline;
 import ec.EvolutionState;
@@ -66,8 +68,13 @@ public class WSCMutationPipeline extends BreedingPipeline {
             GPNode selectedNode = allNodes.get( selectedIndex );
             InOutNode ioNode = (InOutNode) selectedNode;
             
+            // Combine the input from the node with the overall task input, as the latter is available from anywhere
+            Set<String> combinedInputs = new HashSet<String>();
+            combinedInputs.addAll( init.taskInput );
+            combinedInputs.addAll( ioNode.getInputs() );
+            
             // Generate a new tree based on the input/output information of the current node
-            GPNode newNode = species.createNewTree( state, ioNode.getInputs(), ioNode.getOutputs() );
+            GPNode newNode = species.createNewTree( state, combinedInputs, ioNode.getOutputs() );
             
             // Replace the old tree with the new one
             tree.replaceNode( selectedNode, newNode );

@@ -36,7 +36,6 @@ public class WSCSpecies extends Species {
 	    //GPNode treeRoot = graph.nodeMap.get("start").toTree();
 	    
 	    GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput);
-	    
 	    return new WSCIndividual(treeRoot);
 	}
 
@@ -209,14 +208,14 @@ public class WSCSpecies extends Species {
 		// Find nodes that satisfy the given output
 		Set<Service> services = new HashSet<Service>();
 
-		outputLoop:
 		for (String o : outputSet) {
 			List<Service> candidates = init.taxonomyMap.get(o).servicesWithOutput;
 			Collections.shuffle(candidates);
+			candLoop:
 			for (Service cand : candidates) {
 				if (init.relevant.contains(cand)) {
 					services.add(cand);
-					break outputLoop;
+					break candLoop;
 				}
 			}
 		}
@@ -268,6 +267,8 @@ public class WSCSpecies extends Species {
 			rightChild.setService(entry.getKey());
 			rightChild.parent = seq;
 			children[1] = rightChild;
+			
+			seq.children = children;
 		}
 
 		// If more than one subtree is created, put all of them under a parallel node parent.
@@ -284,7 +285,7 @@ public class WSCSpecies extends Species {
 			root = subtrees.get(0);
 		}
 		else {
-			throw new RuntimeException("A service that is not fully satisfied by the");
+			throw new RuntimeException("No subtrees were created when recursing!");
 		}
 
 		return root;
@@ -305,15 +306,15 @@ public class WSCSpecies extends Species {
 		Set<String> inputsNotSatisfied = init.getInputsNotSubsumed(s.getInputs(), inputs);
 
 		// Find services to satisfy all inputs
-		inputLoop:
 		for (String i : inputsNotSatisfied) {
 			List<Service> candidates = init.taxonomyMap.get(i).servicesWithOutput;
 			Collections.shuffle(candidates, init.random);
-
+			
+			candLoop:
 			for(Service cand : candidates) {
 				if (init.relevant.contains(cand) && cand.layer < s.layer) {
-					predecessors.add(s);
-					break inputLoop;
+					predecessors.add(cand);
+					break candLoop;
 				}
 			}
 		}

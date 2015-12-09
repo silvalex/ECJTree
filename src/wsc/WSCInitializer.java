@@ -48,7 +48,6 @@ public class WSCInitializer extends GPInitializer {
 	public Service startServ;
 	public Service endServ;
 	public GraphRandom random;
-	public List<List<Service>> layers;
 
 	public final double minAvailability = 0.0;
 	public double maxAvailability = -1.0;
@@ -292,9 +291,8 @@ public class WSCInitializer extends GPInitializer {
 		Set<Service> sFound = discoverService(services, cSearch);
 		while (!sFound.isEmpty()) {
 			sSet.addAll(sFound);
-			layers.add(layer, new ArrayList<Service>(sFound));
 			// Record the layer that the services belong to in each node
-			for (Service s : layers.get(layer))
+			for (Service s : sFound)
 				s.layer = layer;
 
 			layer++;

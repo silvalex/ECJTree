@@ -24,7 +24,7 @@ public class SequenceGPNode extends GPNode implements InOutNode {
 
 		children[0].eval(state, thread, input, stack, individual, problem);
 		qos = Arrays.copyOf(rd.qos, rd.qos.length);
-		Set<String> inputs = rd.inputs;
+		Set<String> in = rd.inputs;
 
 		children[1].eval(state, thread, input, stack, individual, problem);
 		rd.qos[WSCInitializer.TIME] += qos[WSCInitializer.TIME];
@@ -32,7 +32,7 @@ public class SequenceGPNode extends GPNode implements InOutNode {
 		rd.qos[WSCInitializer.AVAILABILITY] *= qos[WSCInitializer.AVAILABILITY];
 		rd.qos[WSCInitializer.RELIABILITY] *= qos[WSCInitializer.RELIABILITY];
 		// The inputs should be those of the left child, but the outputs and max layer are just those of the right child (already retrieved)
-		rd.inputs = inputs;
+		rd.inputs = in;
 		
 	    // Store input and output information in this node
         inputs = rd.inputs;
@@ -43,15 +43,17 @@ public class SequenceGPNode extends GPNode implements InOutNode {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Sequence(");
-		for (int i = 0; i < children.length; i++) {
-			GPNode child = children[i];
-			if (child != null)
-				builder.append(children[i].toString());
-			else
-				builder.append("null");
-			if (i != children.length - 1){
-				builder.append(",");
-			}
+		if (children != null) {
+    		for (int i = 0; i < children.length; i++) {
+    			GPNode child = children[i];
+    			if (child != null)
+    				builder.append(children[i].toString());
+    			else
+    				builder.append("null");
+    			if (i != children.length - 1){
+    				builder.append(",");
+    			}
+    		}
 		}
 		builder.append(")");
 		return builder.toString();
@@ -64,12 +66,15 @@ public class SequenceGPNode extends GPNode implements InOutNode {
 
 	@Override
 	public SequenceGPNode clone() {
+	    SequenceGPNode newNode = new SequenceGPNode();
 		GPNode[] newChildren = new GPNode[children.length];
 		for (int i = 0; i < children.length; i++) {
 			newChildren[i] = (GPNode) children[i].clone();
+			newChildren[i].parent = newNode;
 		}
-		SequenceGPNode newNode = new SequenceGPNode();
 		newNode.children = newChildren;
+		newNode.inputs = inputs;
+		newNode.outputs = outputs;
 		return newNode;
 	}
 
