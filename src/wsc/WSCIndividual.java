@@ -57,11 +57,11 @@ public class WSCIndividual extends GPIndividual {
 	@Override
 	public WSCIndividual clone() {
 		WSCIndividual wsci = new WSCIndividual((GPNode) super.trees[0].child.clone());
-		wsci.fitness = fitness;
+		wsci.fitness = (SimpleFitness) fitness.clone();
 		wsci.species = species;
 		return wsci;
 	}
-	
+
     public List< GPNode > getAllTreeNodes() {
         List< GPNode > allNodes = new ArrayList< GPNode >();
         Queue< GPNode > queue = new LinkedList< GPNode >();
@@ -79,7 +79,7 @@ public class WSCIndividual extends GPIndividual {
 
         return allNodes;
     }
-    
+
     public void replaceNode(GPNode node, GPNode replacement) {
         // Perform replacement if neither node is null
         if (node != null && replacement != null) {

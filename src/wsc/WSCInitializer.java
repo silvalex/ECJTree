@@ -64,6 +64,8 @@ public class WSCInitializer extends GPInitializer {
 
 	@Override
 	public void setup(EvolutionState state, Parameter base) {
+		// Must get the random object before the super method call, otherwise seed does produce consistent results. Don't ask me why...
+		random = new GraphRandom(state.random[0]);
 		super.setup(state,base);
 
 		Parameter servicesParam = new Parameter("composition-services");
@@ -84,7 +86,6 @@ public class WSCInitializer extends GPInitializer {
 		parseWSCTaxonomyFile(state.parameters.getString(taxonomyParam, null));
 		findConceptsForInstances();
 
-		random = new GraphRandom(state.random[0]);
 
 		double[] mockQos = new double[4];
 		mockQos[TIME] = 0;
