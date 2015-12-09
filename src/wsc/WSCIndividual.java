@@ -1,5 +1,10 @@
 package wsc;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import ec.gp.GPIndividual;
 import ec.gp.GPNode;
 import ec.gp.GPTree;
@@ -56,4 +61,22 @@ public class WSCIndividual extends GPIndividual {
 		wsci.species = species;
 		return wsci;
 	}
+	
+    public List< GPNode > getAllTreeNodes() {
+        List< GPNode > allNodes = new ArrayList< GPNode >();
+        Queue< GPNode > queue = new LinkedList< GPNode >();
+
+        queue.offer( trees[ 0 ].child );
+
+        while ( !queue.isEmpty() ) {
+            GPNode current = queue.poll();
+            allNodes.add( current );
+            if ( current.children != null ) {
+                for ( GPNode child : current.children )
+                    allNodes.add( child );
+            }
+        }
+
+        return allNodes;
+    }
 }

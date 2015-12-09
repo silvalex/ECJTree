@@ -10,9 +10,11 @@ import ec.gp.GPData;
 import ec.gp.GPIndividual;
 import ec.gp.GPNode;
 
-public class SequenceGPNode extends GPNode {
+public class SequenceGPNode extends GPNode implements InOutNode {
 
 	private static final long serialVersionUID = 1L;
+	private Set<String> inputs;
+	private Set<String> outputs;
 
 	@Override
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
@@ -31,6 +33,10 @@ public class SequenceGPNode extends GPNode {
 		rd.qos[WSCInitializer.RELIABILITY] *= qos[WSCInitializer.RELIABILITY];
 		// The inputs should be those of the left child, but the outputs and max layer are just those of the right child (already retrieved)
 		rd.inputs = inputs;
+		
+	    // Store input and output information in this node
+        inputs = rd.inputs;
+        outputs = rd.outputs;
 	}
 
 	@Override
@@ -66,4 +72,12 @@ public class SequenceGPNode extends GPNode {
 		newNode.children = newChildren;
 		return newNode;
 	}
+
+    public Set< String > getInputs() {
+        return inputs;
+    }
+
+    public Set< String > getOutputs() {
+        return outputs;
+    }
 }

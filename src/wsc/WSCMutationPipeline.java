@@ -1,8 +1,14 @@
 package wsc;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import ec.BreedingPipeline;
 import ec.EvolutionState;
 import ec.Individual;
+import ec.gp.GPNode;
 import ec.util.Parameter;
 
 public class WSCMutationPipeline extends BreedingPipeline {
@@ -40,9 +46,44 @@ public class WSCMutationPipeline extends BreedingPipeline {
         for(int q=start;q<n+start;q++) {
             WSCIndividual tree = (WSCIndividual)inds[q];
             WSCSpecies species = (WSCSpecies) tree.species;
-
-            // TODO: Do your thing
-
+            
+            // Randomly select a node in the tree to be mutation
+            List<GPNode> allNodes = new ArrayList<GPNode>();
+            Queue<GPNode> queue = new LinkedList<GPNode>();
+            
+            queue.offer(tree.trees[0].child);
+            
+            while(!queue.isEmpty()) {
+                GPNode current = queue.poll();
+                allNodes.add(current);
+                if (current.children != null) {
+                    for (GPNode child : current.children)
+                        allNodes.add( child );
+                }
+            }
+            
+            int selectedIndex = init.random.nextInt(allNodes.size());
+            GPNode selectedNode = allNodes.get( selectedIndex );
+            InOutNode ioNode = (InOutNode) selectedNode;
+            
+            // Generate a new tree based on the input/output information of the current node
+            GPNode newNode = species.createNewTree( state, ioNode.getInputs(), ioNode.getOutputs() );
+            
+            // Replace the old tree with the new one
+            GPNode parentNode = (GPNode) selectedNode.parent;
+            if (parentNode == null) {
+                tree.trees[0].child = newNode;
+            }
+            else {
+                newNode.parent = selectedNode.parent;
+                for (int i = 0; i < parentNode.children.length; i++) {
+                    if (parentNode.children[i] == selectedNode) {
+                        parentNode.children[i] = newNode;
+                        break;
+                    }
+                }
+            }
+            
             tree.evaluated=false;
         }
         return n;

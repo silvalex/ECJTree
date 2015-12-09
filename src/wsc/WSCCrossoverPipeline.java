@@ -1,8 +1,12 @@
 package wsc;
 
+import java.util.Collections;
+import java.util.List;
+
 import ec.BreedingPipeline;
 import ec.EvolutionState;
 import ec.Individual;
+import ec.gp.GPNode;
 import ec.util.Parameter;
 
 public class WSCCrossoverPipeline extends BreedingPipeline {
@@ -55,16 +59,26 @@ public class WSCCrossoverPipeline extends BreedingPipeline {
 
         // Perform crossover
         for(int q=start,x=0; q < nMin + start; q++,x++) {
-    		WSCIndividual g1 = ((WSCIndividual)inds1[x]);
-    		WSCIndividual g2 = ((WSCIndividual)inds2[x]);
+    		WSCIndividual t1 = ((WSCIndividual)inds1[x]);
+    		WSCIndividual t2 = ((WSCIndividual)inds2[x]);
 
-    		// Fill this in
+    		// Find all nodes from both candidates
+    		List<GPNode> allT1Nodes = t1.getAllTreeNodes();
+            List<GPNode> allT2Nodes = t2.getAllTreeNodes();
+            
+            // Shuffle them so that the crossover is random
+            Collections.shuffle( allT1Nodes, init.random );
+            Collections.shuffle( allT2Nodes, init.random );
+            
+            // For each t1 node, see if it can be replaced by a t2 node
+            
+            // For each t2 node, see if it can be replaced by a t1 node
 
-	        inds[q] = g1;
+	        inds[q] = t1;
 	        inds[q].evaluated=false;
 
 	        if (q+1 < inds.length) {
-	        	inds[q+1] = g2;
+	        	inds[q+1] = t2;
 	        	inds[q+1].evaluated=false;
 	        }
         }

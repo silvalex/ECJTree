@@ -1,6 +1,7 @@
 package wsc;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import ec.EvolutionState;
 import ec.Problem;
@@ -9,10 +10,13 @@ import ec.gp.GPData;
 import ec.gp.GPIndividual;
 import ec.gp.GPNode;
 
-public class ServiceGPNode extends GPNode {
+public class ServiceGPNode extends GPNode implements InOutNode {
 
 	private static final long serialVersionUID = 1L;
 	private Service service;
+	
+	private Set<String> inputs;
+	private Set<String> outputs;
 
 	public ServiceGPNode() {
 		children = new GPNode[0];
@@ -24,10 +28,14 @@ public class ServiceGPNode extends GPNode {
 		rd.maxLayer = service.layer;
 		rd.inputs = service.inputs;
 		rd.outputs = service.outputs;
+		
+	    // Store input and output information in this node
+        inputs = rd.inputs;
+        outputs = rd.outputs;
 	}
 
 	public void setService(Service s) {
-		this.service = s;
+		service = s;
 	}
 
 	@Override
@@ -64,4 +72,12 @@ public class ServiceGPNode extends GPNode {
 		newNode.setService(service);
 		return newNode;
 	}
+
+    public Set<String> getInputs() {
+        return inputs;
+    }
+
+    public Set<String> getOutputs() {
+        return outputs;
+    }
 }

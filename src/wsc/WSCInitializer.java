@@ -24,11 +24,11 @@ import org.xml.sax.SAXException;
 
 import ec.EvolutionState;
 import ec.gp.GPInitializer;
-import graph.GraphRandom;
 import ec.util.Parameter;
-import graph.GraphEdge;
 import graph.Graph;
+import graph.GraphEdge;
 import graph.GraphNode;
+import graph.GraphRandom;
 
 public class WSCInitializer extends GPInitializer {
 

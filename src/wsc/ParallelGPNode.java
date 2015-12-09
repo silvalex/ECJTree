@@ -1,6 +1,5 @@
 package wsc;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,9 +10,11 @@ import ec.gp.GPData;
 import ec.gp.GPIndividual;
 import ec.gp.GPNode;
 
-public class ParallelGPNode extends GPNode {
+public class ParallelGPNode extends GPNode implements InOutNode {
 
 	private static final long serialVersionUID = 1L;
+	private Set<String> inputs;
+	private Set<String> outputs;
 
 	@Override
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
@@ -52,6 +53,10 @@ public class ParallelGPNode extends GPNode {
 		rd.inputs = overallInputs;
 		rd.outputs = overallOutputs;
 		rd.maxLayer = overallMaxLayer;
+		
+		// Store input and output information in this node
+		inputs = overallInputs;
+		outputs = overallOutputs;
 	}
 
 	@Override
@@ -87,4 +92,13 @@ public class ParallelGPNode extends GPNode {
 		newNode.children = newChildren;
 		return newNode ;
 	}
+
+
+    public Set< String > getInputs() {
+        return inputs;
+    }
+
+    public Set< String > getOutputs() {
+        return outputs;
+    }
 }
