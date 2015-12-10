@@ -30,13 +30,14 @@ public class WSCSpecies extends Species {
 	@Override
 	public Individual newIndividual(EvolutionState state, int thread) {
 	    WSCInitializer init = (WSCInitializer) state.initializer;
-	    
+
 	    //Graph graph = createNewGraph(state, init.startServ, init.endServ, init.relevant);
 	    // Turn graph to tree, and return that tree
 	    //GPNode treeRoot = graph.nodeMap.get("start").toTree();
-	    
+
 	    GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput);
-	    return new WSCIndividual(treeRoot);
+	    WSCIndividual tree = new WSCIndividual(treeRoot);
+	    return tree;
 	}
 
 	public Graph createNewGraph(EvolutionState state, Service start, Service end, Set<Service> relevant) {
@@ -267,7 +268,7 @@ public class WSCSpecies extends Species {
 			rightChild.setService(entry.getKey());
 			rightChild.parent = seq;
 			children[1] = rightChild;
-			
+
 			seq.children = children;
 		}
 
@@ -309,7 +310,7 @@ public class WSCSpecies extends Species {
 		for (String i : inputsNotSatisfied) {
 			List<Service> candidates = init.taxonomyMap.get(i).servicesWithOutput;
 			Collections.shuffle(candidates, init.random);
-			
+
 			candLoop:
 			for(Service cand : candidates) {
 				if (init.relevant.contains(cand) && cand.layer < s.layer) {

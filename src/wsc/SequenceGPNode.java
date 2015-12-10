@@ -1,6 +1,7 @@
 package wsc;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import ec.EvolutionState;
@@ -18,44 +19,60 @@ public class SequenceGPNode extends GPNode implements InOutNode {
 
 	@Override
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
-		double[] qos;
+		double maxTime = 0.0;
+		Set<Service> seenServices = new HashSet<Service>();
 
 		WSCData rd = ((WSCData) (input));
 
 		children[0].eval(state, thread, input, stack, individual, problem);
-		qos = Arrays.copyOf(rd.qos, rd.qos.length);
+		maxTime = rd.maxTime;
+		seenServices = rd.seenServices;
 		Set<String> in = rd.inputs;
 
 		children[1].eval(state, thread, input, stack, individual, problem);
-		rd.qos[WSCInitializer.TIME] += qos[WSCInitializer.TIME];
-		rd.qos[WSCInitializer.COST] += qos[WSCInitializer.COST];
-		rd.qos[WSCInitializer.AVAILABILITY] *= qos[WSCInitializer.AVAILABILITY];
-		rd.qos[WSCInitializer.RELIABILITY] *= qos[WSCInitializer.RELIABILITY];
+		rd.maxTime += maxTime;
+		rd.seenServices.addAll(seenServices);
 		// The inputs should be those of the left child, but the outputs and max layer are just those of the right child (already retrieved)
 		rd.inputs = in;
-		
+
 	    // Store input and output information in this node
         inputs = rd.inputs;
         outputs = rd.outputs;
 	}
 
+//	@Override
+//	public String toString() {
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("Sequence(");
+//		if (children != null) {
+//    		for (int i = 0; i < children.length; i++) {
+//    			GPNode child = children[i];
+//    			if (child != null)
+//    				builder.append(children[i].toString());
+//    			else
+//    				builder.append("null");
+//    			if (i != children.length - 1){
+//    				builder.append(",");
+//    			}
+//    		}
+//		}
+//		builder.append(")");
+//		return builder.toString();
+//	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Sequence(");
+		builder.append(String.format("%d [label=\"Sequence\"]; ", hashCode()));
 		if (children != null) {
     		for (int i = 0; i < children.length; i++) {
     			GPNode child = children[i];
-    			if (child != null)
+    			if (child != null) {
+    				builder.append(String.format("%d -> %d [dir=back]; ", hashCode(), children[i].hashCode()));
     				builder.append(children[i].toString());
-    			else
-    				builder.append("null");
-    			if (i != children.length - 1){
-    				builder.append(",");
     			}
     		}
 		}
-		builder.append(")");
 		return builder.toString();
 	}
 

@@ -1,6 +1,7 @@
 package wsc;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import ec.EvolutionState;
@@ -14,7 +15,7 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 
 	private static final long serialVersionUID = 1L;
 	private Service service;
-	
+
 	private Set<String> inputs;
 	private Set<String> outputs;
 
@@ -24,11 +25,12 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 
 	public void eval(final EvolutionState state, final int thread, final GPData input, final ADFStack stack, final GPIndividual individual, final Problem problem) {
 		WSCData rd = ((WSCData) (input));
-		rd.qos = Arrays.copyOf(service.qos, service.qos.length);
-		rd.maxLayer = service.layer;
+		rd.maxTime = service.qos[WSCInitializer.TIME];
+		rd.seenServices = new HashSet<Service>();
+		rd.seenServices.add(service);
 		rd.inputs = service.inputs;
 		rd.outputs = service.outputs;
-		
+
 	    // Store input and output information in this node
         inputs = rd.inputs;
         outputs = rd.outputs;
@@ -38,12 +40,22 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 		service = s;
 	}
 
+//	@Override
+//	public String toString() {
+//		if (service == null)
+//			return "null";
+//		else
+//			return service.name;
+//	}
+
 	@Override
 	public String toString() {
+		String serviceName;
 		if (service == null)
-			return "null";
+			serviceName = "null";
 		else
-			return service.name;
+			serviceName = service.name;
+		return String.format("%d [label=\"%s\"]; ", hashCode(), serviceName);
 	}
 
 	@Override
@@ -53,7 +65,10 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 
 	@Override
 	public int hashCode() {
-		return service.name.hashCode();
+		if (service == null) {
+			return "null".hashCode();
+		}
+		return super.hashCode();
 	}
 
 	@Override

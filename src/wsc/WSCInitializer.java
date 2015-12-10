@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import ec.EvolutionState;
 import ec.gp.GPInitializer;
+import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
 import graph.Graph;
 import graph.GraphEdge;
@@ -61,11 +62,11 @@ public class WSCInitializer extends GPInitializer {
 	public double w2;
 	public double w3;
 	public double w4;
+	public long seed;
 
 	@Override
 	public void setup(EvolutionState state, Parameter base) {
-		// Must get the random object before the super method call, otherwise seed does produce consistent results. Don't ask me why...
-		random = new GraphRandom(state.random[0]);
+		//random = new GraphRandom(state.random[0]); XXX
 		super.setup(state,base);
 
 		Parameter servicesParam = new Parameter("composition-services");
@@ -75,17 +76,20 @@ public class WSCInitializer extends GPInitializer {
 		Parameter weight2Param = new Parameter("fitness-weight2");
 		Parameter weight3Param = new Parameter("fitness-weight3");
 		Parameter weight4Param = new Parameter("fitness-weight4");
+		Parameter seedParam = new Parameter("seed.0");
 
 		w1 = state.parameters.getDouble(weight1Param, null);
 		w2 = state.parameters.getDouble(weight2Param, null);
 		w3 = state.parameters.getDouble(weight3Param, null);
 		w4 = state.parameters.getDouble(weight4Param, null);
+		seed = state.parameters.getLong(seedParam, null);
 
 		parseWSCServiceFile(state.parameters.getString(servicesParam, null));
 		parseWSCTaskFile(state.parameters.getString(taskParam, null));
 		parseWSCTaxonomyFile(state.parameters.getString(taxonomyParam, null));
 		findConceptsForInstances();
 
+		random = new GraphRandom(new MersenneTwisterFast(seed)); // XXX
 
 		double[] mockQos = new double[4];
 		mockQos[TIME] = 0;

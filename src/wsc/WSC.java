@@ -26,8 +26,16 @@ public class WSC extends GPProblem implements SimpleProblemForm {
 
 			GPIndividual gpInd = (GPIndividual) ind;
 			gpInd.trees[0].child.eval(state, threadnum, input, stack, ((GPIndividual) ind), this);
-			double[] qos = input.qos;
+			double[] qos = new double[4];
+			qos[WSCInitializer.TIME] = input.maxTime;
+			qos[WSCInitializer.AVAILABILITY] = 1.0;
+			qos[WSCInitializer.RELIABILITY] = 1.0;
 
+			for (Service s : input.seenServices) {
+				qos[WSCInitializer.COST] += s.qos[WSCInitializer.COST];
+				qos[WSCInitializer.AVAILABILITY] *= s.qos[WSCInitializer.AVAILABILITY];
+				qos[WSCInitializer.RELIABILITY] *= s.qos[WSCInitializer.RELIABILITY];
+			}
 
 			double fitness = calculateFitness(qos[WSCInitializer.AVAILABILITY], qos[WSCInitializer.RELIABILITY], qos[WSCInitializer.TIME], qos[WSCInitializer.COST], init);
 

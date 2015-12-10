@@ -1,12 +1,12 @@
 parent.0                                       = koza.params
 
-seed.0                                         = 7
-#composition-task                               = problem.xml
-#composition-taxonomy                           = taxonomy.xml
-#composition-services                           = services-output.xml
-composition-task                               = test_problem.xml
-composition-taxonomy                           = test_taxonomy.xml
-composition-services                           = test_serv.xml
+seed.0                                         = 0
+composition-task                               = problem.xml
+composition-taxonomy                           = taxonomy.xml
+composition-services                           = services-output.xml
+#composition-task                               = test_problem.xml
+#composition-taxonomy                           = test_taxonomy.xml
+#composition-services                           = test_serv.xml
 fitness-weight1                                = 0.2
 fitness-weight2                                = 0.3
 fitness-weight3                                = 0.2
@@ -37,7 +37,7 @@ stat.do-time                                   = true
 stat.do-final                                  = true
 
 pop.subpops		                               = 1
-pop.subpop.0.size 	                           = 500
+pop.subpop.0.size 	                           = 50
 pop.subpop.0.duplicate-retries 	               = 0
 pop.subpop.0.species                           = wsc.WSCSpecies
 pop.subpop.0.species.ind                       = wsc.WSCIndividual
