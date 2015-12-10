@@ -48,13 +48,13 @@ public class WSCMutationPipeline extends BreedingPipeline {
         for(int q=start;q<n+start;q++) {
             WSCIndividual tree = (WSCIndividual)inds[q];
             WSCSpecies species = (WSCSpecies) tree.species;
-            
+
             // Randomly select a node in the tree to be mutation
             List<GPNode> allNodes = new ArrayList<GPNode>();
             Queue<GPNode> queue = new LinkedList<GPNode>();
-            
+
             queue.offer(tree.trees[0].child);
-            
+
             while(!queue.isEmpty()) {
                 GPNode current = queue.poll();
                 allNodes.add(current);
@@ -63,22 +63,21 @@ public class WSCMutationPipeline extends BreedingPipeline {
                         allNodes.add( child );
                 }
             }
-            
+
             int selectedIndex = init.random.nextInt(allNodes.size());
             GPNode selectedNode = allNodes.get( selectedIndex );
             InOutNode ioNode = (InOutNode) selectedNode;
-            
+
             // Combine the input from the node with the overall task input, as the latter is available from anywhere
             Set<String> combinedInputs = new HashSet<String>();
             combinedInputs.addAll( init.taskInput );
             combinedInputs.addAll( ioNode.getInputs() );
-            
+
             // Generate a new tree based on the input/output information of the current node
             GPNode newNode = species.createNewTree( state, combinedInputs, ioNode.getOutputs() );
-            
+
             // Replace the old tree with the new one
             tree.replaceNode( selectedNode, newNode );
-            
             tree.evaluated=false;
         }
         return n;

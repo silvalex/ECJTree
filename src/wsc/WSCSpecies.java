@@ -211,7 +211,7 @@ public class WSCSpecies extends Species {
 
 		for (String o : outputSet) {
 			List<Service> candidates = init.taxonomyMap.get(o).servicesWithOutput;
-			Collections.shuffle(candidates);
+			Collections.shuffle(candidates, init.random);
 			candLoop:
 			for (Service cand : candidates) {
 				if (init.relevant.contains(cand)) {

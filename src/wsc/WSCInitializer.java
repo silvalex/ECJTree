@@ -62,11 +62,10 @@ public class WSCInitializer extends GPInitializer {
 	public double w2;
 	public double w3;
 	public double w4;
-	public long seed;
 
 	@Override
 	public void setup(EvolutionState state, Parameter base) {
-		//random = new GraphRandom(state.random[0]); XXX
+		random = new GraphRandom(state.random[0]);
 		super.setup(state,base);
 
 		Parameter servicesParam = new Parameter("composition-services");
@@ -76,20 +75,17 @@ public class WSCInitializer extends GPInitializer {
 		Parameter weight2Param = new Parameter("fitness-weight2");
 		Parameter weight3Param = new Parameter("fitness-weight3");
 		Parameter weight4Param = new Parameter("fitness-weight4");
-		Parameter seedParam = new Parameter("seed.0");
 
 		w1 = state.parameters.getDouble(weight1Param, null);
 		w2 = state.parameters.getDouble(weight2Param, null);
 		w3 = state.parameters.getDouble(weight3Param, null);
 		w4 = state.parameters.getDouble(weight4Param, null);
-		seed = state.parameters.getLong(seedParam, null);
 
 		parseWSCServiceFile(state.parameters.getString(servicesParam, null));
 		parseWSCTaskFile(state.parameters.getString(taskParam, null));
 		parseWSCTaxonomyFile(state.parameters.getString(taxonomyParam, null));
 		findConceptsForInstances();
 
-		random = new GraphRandom(new MersenneTwisterFast(seed)); // XXX
 
 		double[] mockQos = new double[4];
 		mockQos[TIME] = 0;
