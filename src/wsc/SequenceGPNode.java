@@ -40,26 +40,6 @@ public class SequenceGPNode extends GPNode implements InOutNode {
         outputs = rd.outputs;
 	}
 
-//	@Override
-//	public String toString() {
-//		StringBuilder builder = new StringBuilder();
-//		builder.append("Sequence(");
-//		if (children != null) {
-//    		for (int i = 0; i < children.length; i++) {
-//    			GPNode child = children[i];
-//    			if (child != null)
-//    				builder.append(children[i].toString());
-//    			else
-//    				builder.append("null");
-//    			if (i != children.length - 1){
-//    				builder.append(",");
-//    			}
-//    		}
-//		}
-//		builder.append(")");
-//		return builder.toString();
-//	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

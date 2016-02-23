@@ -123,12 +123,12 @@ public class WSCInitializer extends GPInitializer {
 	}
 
 	/**
-	 * Checks whether set of inputs can be completely satisfied by the search
-	 * set, making sure to check descendants of input concepts for the subsumption.
+	 * Returns the set of inputs that cannot be satisfied by the search
+	 * set.
 	 *
 	 * @param inputs
 	 * @param searchSet
-	 * @return true if search set subsumed by input set, false otherwise.
+	 * @return inputs not subsumed.
 	 */
 	public Set<String> getInputsNotSubsumed(Set<String> inputs, Set<String> searchSet) {
 		Set<String> notSatisfied = new HashSet<String>();
@@ -139,6 +139,24 @@ public class WSCInitializer extends GPInitializer {
 			}
 		}
 		return notSatisfied;
+	}
+
+	/**
+	 * Returns the set of inputs that can be satisfied by the search set.
+	 *
+	 * @param inputs
+	 * @param searchSet
+	 * @return inputs subsumed.
+	 */
+	public Set<String> getInputsSubsumed(Set<String> inputs, Set<String> searchSet) {
+		Set<String> satisfied = new HashSet<String>();
+		for (String input : inputs) {
+			Set<String> subsumed = taxonomyMap.get(input).getSubsumedConcepts();
+			if (isIntersection(searchSet,subsumed)) {
+				satisfied.add(input);
+			}
+		}
+		return satisfied;
 	}
 
     private static boolean isIntersection( Set<String> a, Set<String> b ) {

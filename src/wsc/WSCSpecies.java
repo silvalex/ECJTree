@@ -1,5 +1,8 @@
 package wsc;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +40,8 @@ public class WSCSpecies extends Species {
 
 	    GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput);
 	    WSCIndividual tree = new WSCIndividual(treeRoot);
+
+	    System.out.println("Created tree");
 	    return tree;
 	}
 
@@ -208,16 +213,26 @@ public class WSCSpecies extends Species {
 
 		// Find nodes that satisfy the given output
 		Set<Service> services = new HashSet<Service>();
+		Set<String> outputsToSatisfy = new HashSet<String>(outputSet);
 
 		for (String o : outputSet) {
-			List<Service> candidates = init.taxonomyMap.get(o).servicesWithOutput;
-			Collections.shuffle(candidates, init.random);
-			candLoop:
-			for (Service cand : candidates) {
-				if (init.relevant.contains(cand)) {
-					services.add(cand);
-					break candLoop;
+			if (outputsToSatisfy.contains(o)) {
+				List<Service> candidates = init.taxonomyMap.get(o).servicesWithOutput;
+				Collections.shuffle(candidates, init.random);
+				Service chosen = null;
+				candLoop:
+				for (Service cand : candidates) {
+					if (init.relevant.contains(cand)) {
+						services.add(cand);
+						chosen = cand;
+						break candLoop;
+					}
 				}
+				outputsToSatisfy.remove(o);
+
+				// Check if other outputs can also be fulfilled by the chosen candidate, and remove them also
+				Set<String> subsumed = init.getInputsSubsumed(outputsToSatisfy, chosen.outputs);
+				outputsToSatisfy.removeAll(subsumed);
 			}
 		}
 
@@ -305,18 +320,29 @@ public class WSCSpecies extends Species {
 
 		// Get only inputs that are not subsumed by the given composition inputs
 		Set<String> inputsNotSatisfied = init.getInputsNotSubsumed(s.getInputs(), inputs);
+		Set<String> inputsToSatisfy = new HashSet<String>(inputsNotSatisfied);
 
 		// Find services to satisfy all inputs
 		for (String i : inputsNotSatisfied) {
-			List<Service> candidates = init.taxonomyMap.get(i).servicesWithOutput;
-			Collections.shuffle(candidates, init.random);
+			if (inputsToSatisfy.contains(i)) {
+				List<Service> candidates = init.taxonomyMap.get(i).servicesWithOutput;
+				Collections.shuffle(candidates, init.random);
 
-			candLoop:
-			for(Service cand : candidates) {
-				if (init.relevant.contains(cand) && cand.layer < s.layer) {
-					predecessors.add(cand);
-					break candLoop;
+				Service chosen = null;
+				candLoop:
+				for(Service cand : candidates) {
+					if (init.relevant.contains(cand) && cand.layer < s.layer) {
+						predecessors.add(cand);
+						chosen = cand;
+						break candLoop;
+					}
 				}
+
+				inputsToSatisfy.remove(i);
+
+				// Check if other outputs can also be fulfilled by the chosen candidate, and remove them also
+				Set<String> subsumed = init.getInputsSubsumed(inputsToSatisfy, chosen.outputs);
+				inputsToSatisfy.removeAll(subsumed);
 			}
 		}
 		return predecessors;
