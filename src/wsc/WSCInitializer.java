@@ -24,7 +24,6 @@ import org.xml.sax.SAXException;
 
 import ec.EvolutionState;
 import ec.gp.GPInitializer;
-import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
 import graph.Graph;
 import graph.GraphEdge;
