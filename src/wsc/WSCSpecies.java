@@ -1,5 +1,8 @@
 package wsc;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,14 +34,27 @@ public class WSCSpecies extends Species {
 	public Individual newIndividual(EvolutionState state, int thread) {
 	    WSCInitializer init = (WSCInitializer) state.initializer;
 
-	    //Graph graph = createNewGraph(state, init.startServ, init.endServ, init.relevant);
+	    Graph graph = createNewGraph(state, init.startServ, init.endServ, init.relevant);
 	    // Turn graph to tree, and return that tree
-	    //GPNode treeRoot = graph.nodeMap.get("start").toTree();
+	    GPNode treeRoot = graph.nodeMap.get("start").toTree();
 
-	    GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput);
+	    //GPNode treeRoot = createNewTree(state, init.taskInput, init.taskOutput); // XXX
+
 	    WSCIndividual tree = new WSCIndividual(treeRoot);
 
-	    System.out.println("Created tree");
+	    System.out.println("Create tree");
+	    try {
+	    	FileWriter writer = new FileWriter(new File("debug-graph.dot"));
+			writer.append(graph.toString());
+			writer.close();
+			FileWriter writer2 = new FileWriter(new File("debug-tree.dot"));
+			writer2.append(tree.toString());
+			writer2.close();
+			System.exit(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	    return tree;
 	}
 

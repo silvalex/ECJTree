@@ -104,7 +104,7 @@ public class ParallelGPNode extends GPNode implements InOutNode {
 		newNode.children = newChildren;
 	    newNode.inputs = inputs;
 	    newNode.outputs = outputs;
-		return newNode ;
+		return newNode;
 	}
 
     public Set< String > getInputs() {

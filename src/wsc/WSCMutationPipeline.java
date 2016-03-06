@@ -12,6 +12,8 @@ import ec.EvolutionState;
 import ec.Individual;
 import ec.gp.GPNode;
 import ec.util.Parameter;
+import graph.Graph;
+import graph.GraphNode;
 
 public class WSCMutationPipeline extends BreedingPipeline {
 
@@ -74,7 +76,17 @@ public class WSCMutationPipeline extends BreedingPipeline {
             combinedInputs.addAll( ioNode.getInputs() );
 
             // Generate a new tree based on the input/output information of the current node
-            GPNode newNode = species.createNewTree( state, combinedInputs, ioNode.getOutputs() );
+            //GPNode newNode = species.createNewTree( state, combinedInputs, ioNode.getOutputs() ); //XXX
+
+            double[] mockQoS = new double[4];
+            mockQoS[WSCInitializer.TIME] = 0.0;
+            mockQoS[WSCInitializer.COST] = 0.0;
+            mockQoS[WSCInitializer.AVAILABILITY] = 1.0;
+            mockQoS[WSCInitializer.RELIABILITY] = 1.0;
+            Service startNode = new Service("start", mockQoS, new HashSet<String>(), combinedInputs);
+            Service endNode = new Service("end", mockQoS, ioNode.getOutputs(), new HashSet<String>());
+            Graph newGraph = species.createNewGraph(state, startNode, endNode, init.relevant);
+            GPNode newNode = newGraph.nodeMap.get("start").toTree();
 
             // Replace the old tree with the new one
             tree.replaceNode( selectedNode, newNode );

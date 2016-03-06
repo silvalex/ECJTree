@@ -80,14 +80,14 @@ public class ServiceGPNode extends GPNode implements InOutNode {
 			return false;
 	}
 
-	@Override
-	public ServiceGPNode clone() {
-		ServiceGPNode newNode = new ServiceGPNode();
-		newNode.setService(service);
-	    newNode.inputs = inputs;
-	    newNode.outputs = outputs;
-		return newNode;
-	}
+//	@Override
+//	public ServiceGPNode clone() {
+//		ServiceGPNode newNode = new ServiceGPNode();
+//		newNode.setService(service);
+//	    newNode.inputs = inputs;
+//	    newNode.outputs = outputs;
+//		return newNode;
+//	}
 
     public Set<String> getInputs() {
         return inputs;
